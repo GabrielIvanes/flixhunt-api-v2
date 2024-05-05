@@ -4,7 +4,7 @@ const crypto = require('crypto');
 require('dotenv').config();
 const emailValidator = require('deep-email-validator');
 
-const UserModel = require('../../models/user');
+const UserModel = require('../../models/userModel');
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 

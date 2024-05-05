@@ -1,17 +1,16 @@
 const mongoose = require('mongoose');
 
-const episodeSchema = new mongoose.Schema({
+const seasonSchema = new mongoose.Schema({
   credits: {
     cast: [{ id: { type: Number, ref: 'cast' } }],
     crew: [{ id: { type: Number, ref: 'crew' } }],
   },
   TMDBId: { type: Number, required: true },
   TMDBTvId: { type: Number, required: true },
-  TMDBSeasonId: { type: Number, required: true },
   overview: { type: String },
   posterPath: { type: String },
   date: { type: String },
-  episode_number: { type: Number },
+  seasonNumber: { type: Number },
   name: { type: String },
   video: {
     name: { type: String },
@@ -20,11 +19,8 @@ const episodeSchema = new mongoose.Schema({
     type: { type: String },
     official: { type: Boolean },
   },
-  images: [
-    {
-      path: { type: String },
-    },
-  ],
+  providers: [{ id: { type: Number, ref: 'provider' } }],
+  createdAt: { type: Date, default: Date.now, required: true },
 });
 
-module.exports = mongoose.model('episode', episodeSchema);
+module.exports = mongoose.model('season', seasonSchema);

@@ -11,6 +11,8 @@ const TVShowsTMDBRoutes = require('./src/routes/TMDB/TVShowsRoutes');
 const personsTMDBRoutes = require('./src/routes/TMDB/personsRoutes');
 const searchTMDBRoutes = require('./src/routes/TMDB/searchRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const actionsRoutes = require('./src/routes/actionsRoutes');
+const elementsRoutes = require('./src/routes/elementsRoutes');
 
 const app = express();
 
@@ -30,13 +32,14 @@ app
 app.get('/', (req, res) => {
   res.json('Hello server 🙌');
 });
-
 app.use('/api/TMDB/settings', settingsTMDBRoutes);
 app.use('/api/TMDB/movies', moviesTMDBRoutes);
 app.use('/api/TMDB/tv', TVShowsTMDBRoutes);
 app.use('/api/TMDB/persons', personsTMDBRoutes);
 app.use('/api/TMDB', searchTMDBRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/lists', actionsRoutes);
+app.use('/api/elements', elementsRoutes);
 
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}/`);

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const UserModel = require('../../models/user');
+const UserModel = require('../../models/userModel');
 
 const getUser = (req, res) => {
   const id = req.params.id;

@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
 const listSchema = new mongoose.Schema({
-  userId: { type: Number, required: true, ref: 'user' },
+  userId: { type: String, required: true, ref: 'user' },
   name: { type: String, required: true },
 });
 
 const elementInListSchema = new mongoose.Schema({
-  listId: { type: Number, ref: 'list' },
-  elementId: { type: Number, required: true, refPath: 'elementModel' },
+  listId: { type: String, required: true, ref: 'list' },
+  elementId: { type: String, required: true, refPath: 'elementModel' },
   elementModel: {
     type: String,
     required: true,
