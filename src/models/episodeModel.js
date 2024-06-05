@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const episodeSchema = new mongoose.Schema({
   credits: {
@@ -7,10 +8,11 @@ const episodeSchema = new mongoose.Schema({
   },
   TMDBId: { type: Number, required: true },
   TMDBTvId: { type: Number, required: true },
-  TMDBSeasonId: { type: Number, required: true },
+  nbSeason: { type: Number, required: true },
   overview: { type: String },
   posterPath: { type: String },
   date: { type: String },
+  runtime: { type: String },
   episodeNumber: { type: Number },
   name: { type: String },
   video: {
@@ -25,7 +27,7 @@ const episodeSchema = new mongoose.Schema({
       path: { type: String },
     },
   ],
-  createdAt: { type: Date, default: Date.now, required: true },
+  createdAt: { type: String, default: moment().format(), required: true },
 });
 
 module.exports = mongoose.model('episode', episodeSchema);

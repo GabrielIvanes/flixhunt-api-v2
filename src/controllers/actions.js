@@ -23,8 +23,10 @@ const createList = async (req, res) => {
       const newList = new listModel({ userId: userId, name: name });
       newList
         .save()
-        .then(() => {
-          return res.status(201).json('list has been added.');
+        .then((list) => {
+          return res
+            .status(201)
+            .json({ list: list, message: 'list has been added.' });
         })
         .catch((err) => {
           return res.status(500).json(err);
@@ -34,6 +36,56 @@ const createList = async (req, res) => {
     }
   } else return res.status(404).json('Missing userId or list name.');
 };
+
+const deleteList = async (req, res) => {
+  const { id } = req.params;
+  const enumDefaultListsName = ['Like', 'Watchlist', 'Seen', 'TheaterSeen'];
+
+  try {
+    if (!id) return res.status(404).json('Missing id.');
+
+    const list = await listModel.findOne({ _id: id });
+
+    if (!list) return res.status(400).json("The list given doesn't exist.");
+
+    if (enumDefaultListsName.includes(list.name))
+      return res.status(400).json("You can't delete a default list.");
+
+    const isElementsDeleted = await deleteElementsFromList(id);
+
+    console.log(isElementsDeleted);
+
+    if (!isElementsDeleted)
+      return res.status(400).json("Elements couldn't be deleted.");
+    listModel
+      .deleteOne({
+        _id: id,
+      })
+      .then(() => {
+        return res.status(200).json(`The list has been deleted`);
+      })
+      .catch((err) => {
+        return res.status(500).json(err);
+      });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+async function deleteElementsFromList(listId) {
+  try {
+    const firstElementInList = await elementInListModel.findOne({
+      listId: listId,
+    });
+
+    if (!firstElementInList) return true;
+
+    await elementInListModel.deleteMany({ listId: listId });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const getUserLists = async (req, res) => {
   const userId = req.params.userId;
@@ -95,6 +147,130 @@ const getListElements = async (req, res) => {
   } else return res.status(404).json('Missing listId.');
 };
 
+const getListElementsInfo = async (req, res) => {
+  const listId = req.params.id;
+
+  if (!listId) return res.status(404).json('Missing listId.');
+
+  try {
+    const elements = await elementInListModel.find({ listId: listId });
+    const elementsInfo = [];
+    for (const element of elements) {
+      let elementInfo;
+      switch (element.elementModel) {
+        case 'movie':
+          elementInfo = await movieModel
+            .findOne({ TMDBId: element.elementId })
+            .lean();
+          break;
+        case 'tv':
+          elementInfo = await tvShowModel
+            .findOne({
+              TMDBId: element.elementId,
+            })
+            .lean();
+          break;
+        case 'season':
+          elementInfo = await seasonModel
+            .findOne({
+              TMDBId: element.elementId,
+            })
+            .lean();
+          break;
+        case 'episode':
+          elementInfo = await episodeModel
+            .findOne({
+              TMDBId: element.elementId,
+            })
+            .lean();
+          break;
+      }
+      const newELementInfo = { ...elementInfo, media: element.elementModel };
+      elementsInfo.push(newELementInfo);
+    }
+    return res.status(200).json(elementsInfo);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+const getListElementsInfoPerPagesFilters = async (req, res) => {
+  const listId = req.params.id;
+  const page = req.params.page;
+  const filters = req.body.filters;
+
+  if (!listId) return res.status(404).json('Missing listId.');
+
+  try {
+    const elements = await elementInListModel.find({ listId: listId });
+
+    const filteredElements = [];
+
+    for (const element of elements) {
+      if (
+        filters.media.some((media) => media.devString === element.elementModel)
+      ) {
+        filteredElements.push(element);
+      }
+    }
+
+    const elementsInfo = [];
+
+    let start = 18 * (page - 1);
+    let end = Math.min(start + 18, filteredElements.length);
+
+    console.log(page);
+    console.log(start);
+    console.log(end);
+
+    for (let i = start; i < end; i++) {
+      console.log(i);
+
+      let elementInfo;
+      switch (filteredElements[i].elementModel) {
+        case 'movie':
+          elementInfo = await movieModel
+            .findOne({ TMDBId: filteredElements[i].elementId })
+            .lean();
+          break;
+        case 'tv':
+          elementInfo = await tvShowModel
+            .findOne({
+              TMDBId: filteredElements[i].elementId,
+            })
+            .lean();
+          break;
+        case 'season':
+          elementInfo = await seasonModel
+            .findOne({
+              TMDBId: filteredElements[i].elementId,
+            })
+            .lean();
+          break;
+        case 'episode':
+          elementInfo = await episodeModel
+            .findOne({
+              TMDBId: filteredElements[i].elementId,
+            })
+            .lean();
+          break;
+      }
+      const newELementInfo = {
+        ...elementInfo,
+        media: filteredElements[i].elementModel,
+      };
+      elementsInfo.push(newELementInfo);
+    }
+    return res.status(200).json({
+      totalResults: filteredElements.length,
+      totalPages: Math.floor(filteredElements.length / 18) + 1,
+      elements: elementsInfo,
+    });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
 const addElementToList = async (req, res) => {
   const listId = req.params.id;
   const TMDBId = req.body.elementId;
@@ -132,7 +308,7 @@ const addElementToList = async (req, res) => {
 
       const elements = await elementInListModel.find({ listId: listId });
 
-      if (elements.some((element) => element.id === TMDBId))
+      if (elements.some((element) => element.elementId === TMDBId))
         return res
           .status(204)
           .json("Element already in this list or list doesn't exist yet.");
@@ -187,8 +363,11 @@ const isElementInList = async (req, res) => {
       elementId: TMDBId,
       elementModel: elementModel,
     });
-    if (elementInList) return res.status(200).json(true);
-    else return res.status(200).json(false);
+    if (elementInList)
+      return res
+        .status(200)
+        .json({ include: true, date: elementInList.dateAdded });
+    else return res.status(200).json({ include: false });
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -217,6 +396,60 @@ const getListElementsByElementModel = async (req, res) => {
   }
 };
 
+const removeElementFromList = async (req, res) => {
+  const { id, elementModel, TMDBId } = req.params;
+
+  const enumElementModel = ['movie', 'tv', 'episode', 'season'];
+
+  if (
+    !(id && TMDBId && elementModel && enumElementModel.includes(elementModel))
+  )
+    return res
+      .status(404)
+      .json(
+        'Missing listId or TMDBId or elementModel or elementModel is not allowed.'
+      );
+
+  const elementInList = elementInListModel.findOne({
+    listId: id,
+    elementId: TMDBId,
+    elementModel: elementModel,
+  });
+
+  if (!elementInList) return res.status(404).json('Element is not in list.');
+
+  elementInListModel
+    .deleteOne({
+      listId: id,
+      elementId: TMDBId,
+      elementModel: elementModel,
+    })
+    .then(() => {
+      return res
+        .status(200)
+        .json(`Element ${elementModel} of id ${TMDBId} has been deleted.`);
+    })
+    .catch((err) => {
+      return res.status(500).json(err);
+    });
+};
+
+const updateListName = async (req, res) => {
+  const listId = req.params.id;
+  const newName = req.params.newName;
+
+  if (!(listId && newName))
+    return res.status(404).json('Missing listId or new name.');
+  listModel
+    .findOneAndUpdate({ _id: listId }, { name: newName })
+    .then(() => {
+      return res.status(200).json('List name has been updated.');
+    })
+    .catch((err) => {
+      return res.status(500).json(err);
+    });
+};
+
 module.exports = {
   createList,
   getUserLists,
@@ -226,4 +459,9 @@ module.exports = {
   addElementToList,
   isElementInList,
   getListElementsByElementModel,
+  removeElementFromList,
+  deleteList,
+  getListElementsInfo,
+  getListElementsInfoPerPagesFilters,
+  updateListName,
 };

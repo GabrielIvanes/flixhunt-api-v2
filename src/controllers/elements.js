@@ -82,6 +82,23 @@ const getMovie = async (req, res) => {
   }
 };
 
+const removeMovie = async (req, res) => {
+  const TMDBId = req.body.TMDBId;
+
+  try {
+    movieModel.deleteOne({ TMDBId: TMDBId }).then(() => {
+      return res
+        .status(200)
+        .json(`Movie ${TMDBId} has been deleted`)
+        .catch((err) => {
+          return res.status(400).json(err);
+        });
+    });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
 const addTvShow = async (req, res) => {
   const {
     backdropPath,
@@ -91,7 +108,8 @@ const addTvShow = async (req, res) => {
     overview,
     posterPath,
     recommendations,
-    date,
+    firstDate,
+    lastDate,
     tagline,
     name,
     voteAverage,
@@ -117,7 +135,8 @@ const addTvShow = async (req, res) => {
       overview: overview,
       posterPath: posterPath,
       recommendations: recommendations,
-      date: date,
+      firstDate: firstDate,
+      lastDate: lastDate,
       tagline: tagline,
       name: name,
       voteAverage: voteAverage,
@@ -227,7 +246,7 @@ const addEpisode = async (req, res) => {
     genres,
     TMDBId,
     TMDBTvId,
-    TMDBSeasonId,
+    nbSeason,
     overview,
     posterPath,
     date,
@@ -236,6 +255,8 @@ const addEpisode = async (req, res) => {
     video,
     images,
   } = req.body;
+
+  console.log(images);
 
   if (!(TMDBId && name))
     return res.status(404).json('Missing TMDBId or the name of the episode.');
@@ -249,7 +270,7 @@ const addEpisode = async (req, res) => {
       genres: genres,
       TMDBId: TMDBId,
       TMDBTvId: TMDBTvId,
-      TMDBSeasonId: TMDBSeasonId,
+      nbSeason: nbSeason,
       overview: overview,
       posterPath: posterPath,
       date: date,

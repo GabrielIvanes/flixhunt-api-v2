@@ -34,12 +34,15 @@ const signUp = async (req, res) => {
     });
     userModel
       .save()
-      .then((user) => res.status(201).json(user))
-      .catch((err) =>
-        res
-          .status(400)
-          .json({ message: 'An account with this email already exist.' })
-      );
+      .then((user) => {
+        return res.status(201).json(user);
+      })
+      .catch((err) => {
+        return res.status(400).json({
+          message: 'An account with this email already exist.',
+          error: err,
+        });
+      });
   });
 };
 

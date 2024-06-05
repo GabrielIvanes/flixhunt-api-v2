@@ -7,7 +7,7 @@ const listSchema = new mongoose.Schema({
 
 const elementInListSchema = new mongoose.Schema({
   listId: { type: String, required: true, ref: 'list' },
-  elementId: { type: String, required: true, refPath: 'elementModel' },
+  elementId: { type: Number, required: true, refPath: 'elementModel' },
   elementModel: {
     type: String,
     required: true,

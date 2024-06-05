@@ -13,6 +13,7 @@ const searchTMDBRoutes = require('./src/routes/TMDB/searchRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const actionsRoutes = require('./src/routes/actionsRoutes');
 const elementsRoutes = require('./src/routes/elementsRoutes');
+const commentsRoutes = require('./src/routes/commentRoutes');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/api/TMDB', searchTMDBRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/lists', actionsRoutes);
 app.use('/api/elements', elementsRoutes);
+app.use('/api/comments', commentsRoutes);
 
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}/`);

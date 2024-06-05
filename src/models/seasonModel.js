@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const seasonSchema = new mongoose.Schema({
   credits: {
@@ -20,7 +21,7 @@ const seasonSchema = new mongoose.Schema({
     official: { type: Boolean },
   },
   providers: [{ id: { type: Number, ref: 'provider' } }],
-  createdAt: { type: Date, default: Date.now, required: true },
+  createdAt: { type: String, default: moment().format(), required: true },
 });
 
 module.exports = mongoose.model('season', seasonSchema);

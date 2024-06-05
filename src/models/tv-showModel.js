@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const TVShowSchema = new mongoose.Schema({
   backDropPath: { type: String },
@@ -11,7 +12,8 @@ const TVShowSchema = new mongoose.Schema({
   overview: { type: String },
   posterPath: { type: String },
   recommendations: [{ id: { type: Number, ref: 'tv' } }],
-  date: { type: String },
+  firstDate: { type: String },
+  lastDate: { type: String },
   tagline: { type: String },
   name: { type: String },
   voteAverage: { type: Number },
@@ -26,7 +28,7 @@ const TVShowSchema = new mongoose.Schema({
   },
   providers: [{ id: { type: Number, ref: 'provider' } }],
   creators: [{ id: { type: Number, ref: 'crew' } }],
-  createdAt: { type: Date, default: Date.now, required: true },
+  createdAt: { type: String, default: moment().format(), required: true },
 });
 
 module.exports = mongoose.model('tv', TVShowSchema);

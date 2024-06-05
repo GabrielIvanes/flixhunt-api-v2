@@ -1,16 +1,17 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const movieSchema = new mongoose.Schema({
   backDropPath: { type: String },
   credits: {
-    cast: [{ id: { type: String, ref: 'cast' } }],
-    crew: [{ id: { type: String, ref: 'crew' } }],
+    cast: [{ id: { type: Number, ref: 'cast' } }],
+    crew: [{ id: { type: Number, ref: 'crew' } }],
   },
   genres: [{ id: { type: Number, ref: 'genre' } }],
   TMDBId: { type: Number, required: true },
   overview: { type: String },
   posterPath: { type: String },
-  recommendations: [{ id: { type: String, ref: 'movie' } }],
+  recommendations: [{ id: { type: Number, ref: 'movie' } }],
   date: { type: String },
   runtime: { type: Number },
   tagline: { type: String },
@@ -23,9 +24,9 @@ const movieSchema = new mongoose.Schema({
     type: { type: String },
     official: { type: Boolean },
   },
-  providers: [{ id: { type: String, ref: 'provider' } }],
-  directors: [{ id: { type: String, ref: 'crew' } }],
-  createdAt: { type: Date, default: Date.now, required: true },
+  providers: [{ id: { type: Number, ref: 'provider' } }],
+  directors: [{ id: { type: Number, ref: 'crew' } }],
+  createdAt: { type: String, default: moment().format(), required: true },
 });
 
 module.exports = mongoose.model('movie', movieSchema);
