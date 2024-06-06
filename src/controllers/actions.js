@@ -53,8 +53,6 @@ const deleteList = async (req, res) => {
 
     const isElementsDeleted = await deleteElementsFromList(id);
 
-    console.log(isElementsDeleted);
-
     if (!isElementsDeleted)
       return res.status(400).json("Elements couldn't be deleted.");
     listModel
@@ -205,13 +203,19 @@ const getListElementsInfoPerPagesFilters = async (req, res) => {
     const elements = await elementInListModel.find({ listId: listId });
 
     const filteredElements = [];
+    let media = [];
+
+    if (filters.media.length === 0) {
+      media = ['movie', 'tv', 'season'];
+    } else {
+      media = filters.media.map((m) => m.devString);
+    }
+
+    const mediaSet = new Set(elements.map((element) => element.elementModel));
+    const uniqueMediaList = Array.from(mediaSet);
 
     for (const element of elements) {
-      if (
-        filters.media.some((media) => media.devString === element.elementModel)
-      ) {
-        filteredElements.push(element);
-      }
+      if (media.includes(element.elementModel)) filteredElements.push(element);
     }
 
     const elementsInfo = [];
@@ -219,13 +223,7 @@ const getListElementsInfoPerPagesFilters = async (req, res) => {
     let start = 18 * (page - 1);
     let end = Math.min(start + 18, filteredElements.length);
 
-    console.log(page);
-    console.log(start);
-    console.log(end);
-
     for (let i = start; i < end; i++) {
-      console.log(i);
-
       let elementInfo;
       switch (filteredElements[i].elementModel) {
         case 'movie':
@@ -261,9 +259,14 @@ const getListElementsInfoPerPagesFilters = async (req, res) => {
       };
       elementsInfo.push(newELementInfo);
     }
+    console.log(Math.floor(filteredElements.length / 18));
     return res.status(200).json({
+      media: uniqueMediaList,
       totalResults: filteredElements.length,
-      totalPages: Math.floor(filteredElements.length / 18) + 1,
+      totalPages:
+        filteredElements.length % 18 === 0
+          ? Math.floor(filteredElements.length / 18)
+          : Math.floor(filteredElements.length / 18) + 1,
       elements: elementsInfo,
     });
   } catch (err) {
