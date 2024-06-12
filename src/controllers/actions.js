@@ -196,6 +196,7 @@ const getListElementsInfoPerPagesFilters = async (req, res) => {
   const listId = req.params.id;
   const page = req.params.page;
   const filters = req.body.filters;
+  const firstRender = req.params.firstRender === 'true';
 
   if (!listId) return res.status(404).json('Missing listId.');
 
@@ -205,14 +206,22 @@ const getListElementsInfoPerPagesFilters = async (req, res) => {
     const filteredElements = [];
     let media = [];
 
+    const mediaSet = new Set(elements.map((element) => element.elementModel));
+    const uniqueMediaList = Array.from(mediaSet);
+
     if (filters.media.length === 0) {
-      media = ['movie', 'tv', 'season'];
+      if (firstRender === true) {
+        if (uniqueMediaList.length === 1) {
+          media = uniqueMediaList;
+        } else {
+          media = ['movie', 'tv', 'season'];
+        }
+      } else {
+        media = [];
+      }
     } else {
       media = filters.media.map((m) => m.devString);
     }
-
-    const mediaSet = new Set(elements.map((element) => element.elementModel));
-    const uniqueMediaList = Array.from(mediaSet);
 
     for (const element of elements) {
       if (media.includes(element.elementModel)) filteredElements.push(element);
@@ -259,7 +268,6 @@ const getListElementsInfoPerPagesFilters = async (req, res) => {
       };
       elementsInfo.push(newELementInfo);
     }
-    console.log(Math.floor(filteredElements.length / 18));
     return res.status(200).json({
       media: uniqueMediaList,
       totalResults: filteredElements.length,

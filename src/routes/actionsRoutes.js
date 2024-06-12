@@ -30,7 +30,7 @@ router.get(
 router.get('/:id/elements/info', auth, actionsController.getListElementsInfo);
 router.get('/:id/elements', auth, actionsController.getListElements);
 router.post(
-  '/:id/page/:page',
+  '/:id/page/:page/isFirstRender/:firstRender',
   auth,
   actionsController.getListElementsInfoPerPagesFilters
 );
