@@ -2,25 +2,24 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 require('dotenv').config();
-const emailValidator = require('deep-email-validator');
+const validator = require('email-validator');
 
 const UserModel = require('../../models/userModel');
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
-async function isEmailValid(email) {
-  return await emailValidator.validate(email);
+function isEmailValid(email) {
+  return validator.validate(email);
 }
 
 const signUp = async (req, res) => {
   const { username, email, password } = req.body;
 
-  const { valid, reason, validators } = await isEmailValid(email);
+  const valid = isEmailValid(email);
 
   if (!valid) {
     return res.status(400).json({
       message: 'Please provide a valid email address.',
-      reason: validators[reason].reason,
     });
   }
 
