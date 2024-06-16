@@ -29,13 +29,6 @@ const corsOptions = {
 
 const allowedOrigins = ['https://flixhunt-v2.vercel.app'];
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
@@ -57,6 +50,13 @@ app.use((req, res, next) => {
     next();
   }
 });
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
   res.json('Hello server 🙌');
