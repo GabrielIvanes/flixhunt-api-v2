@@ -14,32 +14,25 @@ const userRoutes = require('./src/routes/userRoutes');
 const actionsRoutes = require('./src/routes/actionsRoutes');
 const elementsRoutes = require('./src/routes/elementsRoutes');
 const commentsRoutes = require('./src/routes/commentRoutes');
-
 const app = express();
 
-const port = process.env.port || 3000;
+const port = 3000;
 
 const corsOptions = {
   origin: [
-    'https://flixhunt-v2.vercel.app/',
-    'https://flixhunt-api-v2.vercel.app/',
+    'https://flixhunt-v2.vercel.app',
+    'https://flixhunt-api-v2.vercel.app',
   ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://flixhunt-v2.vercel.app');
-  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
-});
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
-app
-  .use(cors(corsOptions))
-  .use(bodyParser.json())
-  .use(bodyParser.urlencoded({ extended: true }))
-  .use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
   res.json('Hello server 🙌');
