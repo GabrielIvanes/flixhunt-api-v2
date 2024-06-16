@@ -61,7 +61,7 @@ const signIn = async (req, res) => {
                 expiresIn: maxAge,
               }
             );
-            res.cookie('accessToken', token, { httpOnly: true, maxAge });
+            res.cookie('accessToken', token, { maxAge });
             return res.json({
               user: user._id,
               xsrfToken: xsrfToken,
