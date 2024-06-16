@@ -25,10 +25,20 @@ const corsOptions = {
   credentials: true, // Autorise les cookies et autres informations d'identification
 };
 
+app.options('*', cors(corsOptions));
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://flixhunt-v2.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
+
 app
+  .use(cors(corsOptions))
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: true }))
-  .use(cors(corsOptions))
   .use(cookieParser());
 
 app.get('/', (req, res) => {
