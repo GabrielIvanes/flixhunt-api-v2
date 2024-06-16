@@ -61,7 +61,12 @@ const signIn = async (req, res) => {
                 expiresIn: maxAge,
               }
             );
-            res.cookie('accessToken', token, { maxAge });
+            res.cookie('accessToken', token, {
+              maxAge,
+              httpOnly: true,
+              secure: true,
+              domain: '.vercel.app',
+            });
             return res.json({
               user: user._id,
               xsrfToken: xsrfToken,
