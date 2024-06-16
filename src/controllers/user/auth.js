@@ -65,7 +65,7 @@ const signIn = async (req, res) => {
               maxAge,
               httpOnly: true,
               secure: true,
-              domain: '.vercel.app',
+              domain: 'vercel.app',
             });
             return res.json({
               user: user._id,
