@@ -34,6 +34,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+if (req.method === 'OPTIONS') {
+  res.sendStatus(200);
+} else {
+  next();
+}
+
 app.get('/', (req, res) => {
   res.json('Hello server 🙌');
 });
