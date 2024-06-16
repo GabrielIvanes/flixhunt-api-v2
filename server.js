@@ -18,8 +18,17 @@ const app = express();
 
 const port = 3000;
 
-app.use(cors());
-app.options('*', cors());
+const corsOptions = {
+  origin: [
+    'https://flixhunt-v2.vercel.app',
+    'https://flixhunt-api-v2.vercel.app',
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
