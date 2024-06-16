@@ -20,17 +20,17 @@ const app = express();
 const port = process.env.port || 3000;
 
 const corsOptions = {
-  origin: 'https://flixhunt-v2.vercel.app', // Autorise cette origine
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Autorise les méthodes HTTP nécessaires
-  credentials: true, // Autorise les cookies et autres informations d'identification
+  origin: [
+    'https://flixhunt-v2.vercel.app/',
+    'https://flixhunt-api-v2.vercel.app/',
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
 };
-
-app.options('*', cors(corsOptions));
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'https://flixhunt-v2.vercel.app');
   res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
   next();
 });
